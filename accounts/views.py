@@ -1,4 +1,3 @@
-from rest_framework import status
 import datetime
 import jwt
 from rest_framework import generics, status
