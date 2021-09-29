@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
+from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -26,4 +27,12 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.save()
         return user
+
+class Product(models.Model):
+    name = models.CharField(max_length=120, null=False, blank=False)
+    text_of_problem = models.TextField()
+
+    def __str__(self):
+        return self.name
+
 
