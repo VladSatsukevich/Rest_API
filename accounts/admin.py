@@ -1,6 +1,9 @@
 from django.contrib import admin
-from . models import Product
+from . models import Message
 # Register your models here.
 
-admin.site.register(Product)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'status', 'date',)
 
+
+admin.site.register(Message, CategoryAdmin)

@@ -5,6 +5,18 @@ from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+class Message(models.Model):
+    name = models.CharField(max_length=120, null=False, blank=False)
+    date = models.DateTimeField(default=timezone.now)
+    text_of_problem = models.TextField()
+    STATUS = (
+        ('Нерешен', 'Нерешен'),
+        ('Решен', 'Решен'),
+        ('Замарожен', 'Замарожен'),
+    )
+    status = models.CharField(max_length=120, default='Нерешен', choices=STATUS)
+
+
 class UserManager(BaseUserManager):
 
     def create_user(self, username, email, password=None):
@@ -27,12 +39,4 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.save()
         return user
-
-class Product(models.Model):
-    name = models.CharField(max_length=120, null=False, blank=False)
-    text_of_problem = models.TextField()
-
-    def __str__(self):
-        return self.name
-
 

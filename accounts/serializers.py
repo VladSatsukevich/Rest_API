@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from accounts.models import User
-from .models import Product
+from .models import Message
 
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=8, min_length=4, write_only=True)
@@ -47,8 +52,3 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'

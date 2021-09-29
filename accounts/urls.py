@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import RegisterView, LoginView, LogoutView, UserView, apiOverview, ShowAll, ViewProduct, CreateProduct, updateProduct, deleteProduct
-
+from .views import RegisterView, LoginView, LogoutView, UserView, apiOverview, ShowAll, ViewProduct, CreateProduct, updateProduct, deleteProduct, GenericAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
@@ -13,4 +13,7 @@ urlpatterns = [
     path('product-create/', CreateProduct, name='product-create'),
     path('product-update/<int:pk>/', updateProduct, name='product-update'),
     path('product-delete/<int:pk>/', deleteProduct, name='product-delete'),
+    path('generic/<int:id>/', GenericAPIView.as_view()),
+    path('token/', TokenObtainPairView.as_view()),
+    path('token/refresh/', TokenRefreshView.as_view()),
 ]

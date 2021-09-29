@@ -1,12 +1,41 @@
 import datetime
 import jwt
-from rest_framework import generics, status
+from django.http import HttpResponse
+from rest_framework import generics, status, mixins, viewsets
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import User, Product
-from .serializers import RegisterSerializer, ProductSerializer
+from .models import User, Message
+from .serializers import RegisterSerializer, MessageSerializer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
+
+class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+    serializer_class = MessageSerializer
+    queryset = Message.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+    def get(self, request, id=None):
+        if id:
+            return self.retrieve(request)
+        else:
+            return self.list(request)
+        return self.list(request)
+
+    def post(self, request, id=None):
+        return self.create(request, id)
+
+    def put(self, request, id=None):
+        return self.update(request, id)
+
+    def delete(self, request):
+        return self.destroy(request, id)
 
 
 class RegisterView(APIView):
@@ -41,9 +70,7 @@ class LoginView(APIView):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
-
         token = jwt.encode(payload, 'secret', algorithm='HS256')
-
         response = Response()
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
@@ -56,7 +83,7 @@ class LogoutView(APIView):
 
     def post(self, request):
         response = Response()
-        response.delete_cookie( 'jwt' )
+        response.delete_cookie('jwt')
         response.data = {
             'message': 'успешно'
         }
@@ -96,35 +123,34 @@ def apiOverview(request):
 
 @api_view(['GET'])
 def ShowAll(request):
-    products = Product.objects.all()
-    serializer = ProductSerializer(products, many=True)
+    message = Message.objects.all()
+    serializer = MessageSerializer(message, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def ViewProduct(request, pk):
-    product = Product.objects.get(id=pk)
-    serializer = ProductSerializer(product, many=False)
+    message = Message.objects.get(id=pk)
+    serializer = MessageSerializer(message, many=False)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def CreateProduct(request):
-    serializer = ProductSerializer(data=request.data)
+    serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def updateProduct(request, pk):
-    product = Product.objects.get(id=pk)
-    serializer = ProductSerializer(instance=product, data=request.data)
+    message = Message.objects.get(id=pk)
+    serializer = MessageSerializer(instance=message, data=request.data)
     if serializer.is_valid():
         serializer.save()
-
     return Response(serializer.data)
 
 @api_view(['GET'])
 def deleteProduct(request, pk):
-    product = Product.objects.get(id=pk)
-    product.delete()
-
-    return Response('Успешно удалено!')
+    message = Message.objects.get(id=pk)
+    message.delete()
+    return Response('Успешно удалено!', status=status.HTTP_204_NO_CONTENT)
