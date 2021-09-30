@@ -9,6 +9,7 @@ class Message(models.Model):
     name = models.CharField(max_length=120, null=False, blank=False)
     date = models.DateTimeField(default=timezone.now)
     text_of_problem = models.TextField()
+    answer = models.TextField()
     STATUS = (
         ('Нерешен', 'Нерешен'),
         ('Решен', 'Решен'),

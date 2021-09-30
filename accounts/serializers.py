@@ -10,7 +10,6 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=8, min_length=4, write_only=True)
-
     default_error_messages = {
         'username': 'The username should only contain alphanumeric characters'}
 
